@@ -107,6 +107,7 @@
 		822849A6CD8FBDAAC2395245 /* include_juce_core.mm */ /* include_juce_core.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = include_juce_core.mm; path = ../../JuceLibraryCode/include_juce_core.mm; sourceTree = SOURCE_ROOT; };
 		883D6ED6CF2655C837B325F8 /* IOKit.framework */ /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
 		8886C915F896CC1A9BCB4089 /* Info-VST3.plist */ /* Info-VST3.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Info-VST3.plist"; path = "Info-VST3.plist"; sourceTree = SOURCE_ROOT; };
+		89F71A8799A9A94023A6605E /* FmSineOsc.h */ /* FmSineOsc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = FmSineOsc.h; path = ../../Source/FmSineOsc.h; sourceTree = SOURCE_ROOT; };
 		89FC2279DCF8B944BD05E561 /* include_juce_gui_basics.mm */ /* include_juce_gui_basics.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = include_juce_gui_basics.mm; path = ../../JuceLibraryCode/include_juce_gui_basics.mm; sourceTree = SOURCE_ROOT; };
 		8AB255EDA8CEDDF561B13CB5 /* include_juce_gui_extra.mm */ /* include_juce_gui_extra.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = include_juce_gui_extra.mm; path = ../../JuceLibraryCode/include_juce_gui_extra.mm; sourceTree = SOURCE_ROOT; };
 		8C811C554DC3D42E3F5B4A8F /* include_juce_audio_plugin_client_AU_2.mm */ /* include_juce_audio_plugin_client_AU_2.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = include_juce_audio_plugin_client_AU_2.mm; path = ../../JuceLibraryCode/include_juce_audio_plugin_client_AU_2.mm; sourceTree = SOURCE_ROOT; };
@@ -205,6 +206,7 @@
 		194B4589C0FEDD05C6457A1F /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				89F71A8799A9A94023A6605E,
 				7F7316460FEE2EE175D8E2F2,
 				1288489A9F14CDE8AAE3C220,
 				64F51C78775A6491F93FC111,

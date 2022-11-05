@@ -93,12 +93,24 @@ void EvolvingDroneAudioProcessor::changeProgramName (int index, const juce::Stri
 //==============================================================================
 void EvolvingDroneAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
+
+    //initialize carrier sinewave
     carrier.setSampleRate(sampleRate);
     carrier.setFrequency(440);
+    carrierCentralFrequency = carrier.getFrequency();
+    
+    //initialize modulator sinewave
     modulator.setSampleRate(sampleRate);
-    modulator.setFrequency(441);
+    modulator.setFrequency(431.0f);
+    modulatorCentralFrequency = modulator.getFrequency();
 
-
+    
+    //initialize an LFO that will modulate the modulator
+    modulatorLfo.setSampleRate(sampleRate);
+    modulatorLfo.setFrequency(0.1f);
+    modulatorLfo.mapLFO(1.0f);
+    
+    
 }
 
 void EvolvingDroneAudioProcessor::releaseResources()
@@ -135,6 +147,17 @@ bool EvolvingDroneAudioProcessor::isBusesLayoutSupported (const BusesLayout& lay
 
 void EvolvingDroneAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
+    
+    
+    //activate debug flag
+    bool debug = 1;
+    
+    int debugResolution = 200.0f;
+    int debugResolutionCount = 1;
+
+
+    
+    
     juce::ScopedNoDenormals noDenormals;
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
@@ -162,27 +185,80 @@ void EvolvingDroneAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer
     //DSP loop where numSamples corresponds to the buffer size
     for(int i = 0; i<numSamples; i++ )
     {
-        float leftSample = 0;
-        float rightSample = 0;
+        
+        //debug handler
+        bool displayDebug = 0;
+        
+        if (debugResolution % debugResolutionCount == 1)
+            displayDebug = 1;
 
-        carrier.setFrequency(carrier.getFrequency() + modulator.process())
+        //initialize variables
+        float leftSample = 0.0f;
+        float rightSample = 0.0f;
+        float fmWave = 0.0f;
+        float carrierFrequency = 0.0f;
+        float modulationIntensity = 5.0f;
         
-        leftChannelSignals.push_back(<#const_reference __x#>)
-        rightChannelSignals.push_back(<#const_reference __x#>)
+        //set safety gain
+        float safetyGain = 0.4f;
+        
+        //shall the modulator wave frequency get modulated by the lfo?
+        bool modulateTheModulator = 1;
+        
+        //if modulateTheModulator, the modulatro wave frequency will get modulated as well
+        if (modulateTheModulator)
+        {
+            //process the LFO that moduates the frequency of the modulator and store it in processedModulatorLfo
+            float processedModulatorLfo = modulatorLfo.process();
+            
+            //store the modulator frequency, modulated by adding the lfo value
+            float modulatorFrequency = modulatorCentralFrequency + processedModulatorLfo;
+            
+            //update the modulator frequency
+            modulator.setFrequency(modulatorFrequency);
+            if(debug && displayDebug) std::cout << "modulatorFrequency " << modulatorFrequency << "\n\n";
+            if(debug && displayDebug) std::cout << "LFO " << processedModulatorLfo << "\n\n";
+
+
+        }
+        
 
         
+        //process the modulator and store it in processedModulator
+        float processedModulator = modulator.process();
+        float intensifiedModulator = processedModulator * modulationIntensity;
         
+        //store the carrier modulated frequency
+        carrierFrequency = carrierCentralFrequency * intensifiedModulator;
+
+        //update the carrier frequency
+        carrier.setFrequency(carrierFrequency);
+        
+        if(debug && displayDebug) std::cout << "carrierFrequency " << carrierFrequency << "\n\n";
+        if(debug && displayDebug) std::cout << "modulatorOutput " << processedModulator << "\n\n";
+
+        
+        //process the carrier wave
+        fmWave = carrier.process();
+
+        leftChannelSignals.push_back(fmWave);
+        rightChannelSignals.push_back(fmWave);
+
+        
+
         //sum each line of the leftChannelSignals vector together to obtain the unscaled leftSample
         for(int j = 0; j < leftChannelSignals.size(); j++ )
         {
             leftSample += leftChannelSignals[j];
         }
-        
+
         //divide the leftSample value by the number of elements contained within the leftChannelSignals vector,
         //to scale down the signal between -1 and 1
         leftSample /= leftChannelSignals.size();
-        
-        
+
+        //apply safety gain
+        leftSample *= safetyGain;
+
         //sum each line of the leftChannelSignals vector together
         for(int j = 0; j < rightChannelSignals.size(); j++ )
         {
@@ -191,9 +267,18 @@ void EvolvingDroneAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer
         //divide the leftSample value by the number of elements contained within the leftChannelSignals vector,
         //to scale down the signal between -1 and 1
         rightSample /= rightChannelSignals.size();
+        //apply safety gain
+        rightSample *= safetyGain;
 
         leftChannel[i] = leftSample;    //apply generated sample to left channel
         rightChannel[i] = rightSample;  //apply generated sample to right channel
+        
+        //reset the channel vectors
+        rightChannelSignals.clear();
+        leftChannelSignals.clear();
+        
+        //incrementy debug resolution tool
+        debugResolutionCount++;
     }
 }
 
