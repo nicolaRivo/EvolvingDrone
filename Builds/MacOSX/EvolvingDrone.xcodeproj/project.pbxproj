@@ -103,6 +103,7 @@
 		6C684C777D012ACFECA5CEF8 /* VST3 */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EvolvingDrone.vst3; sourceTree = BUILT_PRODUCTS_DIR; };
 		762DE8338FDD6961BBB4B4C7 /* juce_audio_plugin_client */ /* juce_audio_plugin_client */ = {isa = PBXFileReference; lastKnownFileType = folder; name = juce_audio_plugin_client; path = "/Users/nicola/Desktop/Audio Programming/JUCE/modules/juce_audio_plugin_client"; sourceTree = "<absolute>"; };
 		7AA63F24D32977327EC5AF28 /* include_juce_audio_basics.mm */ /* include_juce_audio_basics.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = include_juce_audio_basics.mm; path = ../../JuceLibraryCode/include_juce_audio_basics.mm; sourceTree = SOURCE_ROOT; };
+		7F7316460FEE2EE175D8E2F2 /* DelayLine.h */ /* DelayLine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DelayLine.h; path = ../../Source/DelayLine.h; sourceTree = SOURCE_ROOT; };
 		822849A6CD8FBDAAC2395245 /* include_juce_core.mm */ /* include_juce_core.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = include_juce_core.mm; path = ../../JuceLibraryCode/include_juce_core.mm; sourceTree = SOURCE_ROOT; };
 		883D6ED6CF2655C837B325F8 /* IOKit.framework */ /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
 		8886C915F896CC1A9BCB4089 /* Info-VST3.plist */ /* Info-VST3.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Info-VST3.plist"; path = "Info-VST3.plist"; sourceTree = SOURCE_ROOT; };
@@ -204,6 +205,7 @@
 		194B4589C0FEDD05C6457A1F /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				7F7316460FEE2EE175D8E2F2,
 				1288489A9F14CDE8AAE3C220,
 				64F51C78775A6491F93FC111,
 				5B6B3414BC48D6C420317C26,
