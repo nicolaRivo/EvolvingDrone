@@ -195,7 +195,7 @@ public:
         //multiply output value by the scaleIndex
         outputValue *= scaleIndex;
         
-        assert((minValue>maxValue)); //catch potential troublesom condition fo min being larger than max
+        assert((minValue < maxValue)); //catch potential troublesome condition fo min being larger than max
         
         
         //truncate the output if overtakes set min/max bounduaries
@@ -214,7 +214,7 @@ public:
      @param scaleIndex float, multiplies the lfo values, resulting in a magnified and clipped LFO sinewave if multiplied by a number larger than 1 and a shrunk  LFO sinewave if multiplied by a number between 0 and 1
      */
     
-    void mapLFO(float max, float min, float scale)
+    void mapLFO(float max, float min = 0.00001f, float scale = 1.0f)
     {
         maxValue = max;
         minValue = min;
@@ -226,7 +226,7 @@ private:
     
     float maxValue = 1.0f;
     float minValue = 0.00001f;
-    float scaleIndex = 1;
+    float scaleIndex = 1.0f;
     
     
 };
