@@ -11,6 +11,8 @@
 #include <JuceHeader.h>
 #include "FilterSynth.h"
 #include "Oscillators.h"
+#include "DelayLine.h"
+
 //==============================================================================
 /**
 */
@@ -60,7 +62,15 @@ public:
 private:
     //==============================================================================
     
-    //std::array<Phasor, <#size_t _Size#>>;
+    std::vector<Phasor> oscillators;
+    
+    std::vector<float> leftChannelSignals; // vector to store a sample for all the audio sources to be resolved in the left channel
+    std::vector<float> rightChannelSignals;// vector to store a sample for all the audio sources to be resolved in the right channel
+
+    
+    SineOsc carrier;
+    SineOsc modulator;
+    DelayLine delay;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EvolvingDroneAudioProcessor)
 };
