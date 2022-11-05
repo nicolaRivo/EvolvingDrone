@@ -174,7 +174,54 @@ public:
     {
         assert((freq<20.0f)); // frequency i
     }
+    
+    float output (float phase) override
+    {
+        float outputValue = sin(phase * 2 * 3.141593);
+        
+        
+        
+        //scale the output value between the desired min and max
+        outputValue *= (maxValue - minValue) / 2;  //   set the size of the fluctuation
+        outputValue += (minValue + maxValue) / 2;   //    shift the fluctuation to the correct numeric region
 
+        //multiply output value by the scaleIndex
+        outputValue *= scaleIndex;
+        
+        assert((minValue>maxValue)); //catch potential troublesom condition fo min being larger than max
+        
+        
+        //truncate the output if overtakes set min/max bounduaries
+        if (outputValue < minValue)
+            outputValue=minValue;
+        
+        if (outputValue > maxValue)
+            outputValue=maxValue;
+        
+        return outputValue;
+    }
+    /**
+     this function sets the mapping parameters
+     @param max float, maximum value reached by the LFO
+     @param min float, minimum value reached by the LFO
+     @param scaleIndex float, multiplies the lfo values, resulting in a magnified and clipped LFO sinewave if multiplied by a number larger than 1 and a shrunk  LFO sinewave if multiplied by a number between 0 and 1
+     */
+    
+    void mapLFO(float max, float min, float scale)
+    {
+        maxValue = max;
+        minValue = min;
+        scaleIndex = scale;
+    };
+    
+    
+private:
+    
+    float maxValue = 1.0f;
+    float minValue = 0.00001f;
+    float scaleIndex = 1;
+    
+    
 };
 
 #endif /* Oscillators_h */

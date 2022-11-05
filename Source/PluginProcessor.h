@@ -9,7 +9,8 @@
 #pragma once
 
 #include <JuceHeader.h>
-
+#include "FilterSynth.h"
+#include "Oscillators.h"
 //==============================================================================
 /**
 */
@@ -58,5 +59,8 @@ public:
 
 private:
     //==============================================================================
+    
+    //std::array<Phasor, <#size_t _Size#>>;
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EvolvingDroneAudioProcessor)
 };
