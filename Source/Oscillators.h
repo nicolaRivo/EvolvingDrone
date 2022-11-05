@@ -65,6 +65,13 @@ public:
         return phase;
     };
     
+    
+    float getFrequency()
+    {
+        return frequency;
+    };
+    
+    
 private:
     std::string oscKind = "" ;
     int sampleRate = 44100;
