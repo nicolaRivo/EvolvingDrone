@@ -93,8 +93,12 @@ void EvolvingDroneAudioProcessor::changeProgramName (int index, const juce::Stri
 //==============================================================================
 void EvolvingDroneAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    // Use this method as the place to do any pre-playback
-    // initialisation that you need..
+    carrier.setSampleRate(sampleRate);
+    carrier.setFrequency(440);
+    modulator.setSampleRate(sampleRate);
+    modulator.setFrequency(441);
+
+
 }
 
 void EvolvingDroneAudioProcessor::releaseResources()
@@ -150,11 +154,46 @@ void EvolvingDroneAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer
     // the samples and the outer loop is handling the channels.
     // Alternatively, you can process the samples with the channels
     // interleaved by keeping the same state.
-    for (int channel = 0; channel < totalNumInputChannels; ++channel)
-    {
-        auto* channelData = buffer.getWritePointer (channel);
 
-        // ..do something to the data...
+    int numSamples = buffer.getNumSamples();
+    auto* leftChannel = buffer.getWritePointer(0); //channel 0 for left chan
+    auto* rightChannel = buffer.getWritePointer(1);//channel 1 for right chan
+
+    //DSP loop where numSamples corresponds to the buffer size
+    for(int i = 0; i<numSamples; i++ )
+    {
+        float leftSample = 0;
+        float rightSample = 0;
+
+        carrier.setFrequency(carrier.getFrequency() + modulator.process())
+        
+        leftChannelSignals.push_back(<#const_reference __x#>)
+        rightChannelSignals.push_back(<#const_reference __x#>)
+
+        
+        
+        //sum each line of the leftChannelSignals vector together to obtain the unscaled leftSample
+        for(int j = 0; j < leftChannelSignals.size(); j++ )
+        {
+            leftSample += leftChannelSignals[j];
+        }
+        
+        //divide the leftSample value by the number of elements contained within the leftChannelSignals vector,
+        //to scale down the signal between -1 and 1
+        leftSample /= leftChannelSignals.size();
+        
+        
+        //sum each line of the leftChannelSignals vector together
+        for(int j = 0; j < rightChannelSignals.size(); j++ )
+        {
+            rightSample += rightChannelSignals[j];
+        }
+        //divide the leftSample value by the number of elements contained within the leftChannelSignals vector,
+        //to scale down the signal between -1 and 1
+        rightSample /= rightChannelSignals.size();
+
+        leftChannel[i] = leftSample;    //apply generated sample to left channel
+        rightChannel[i] = rightSample;  //apply generated sample to right channel
     }
 }
 
