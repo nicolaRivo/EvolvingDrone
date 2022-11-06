@@ -12,6 +12,7 @@
 #include "FilterSynth.h"
 #include "Oscillators.h"
 #include "DelayLine.h"
+#include  "Envelope.h"
 
 //==============================================================================
 /**
@@ -61,13 +62,17 @@ public:
 
 private:
     //==============================================================================
+    bool debug = 1;
+    int debugResolution = 200.0f;
+
+    
     
     std::vector<Phasor> oscillators;
     
     std::vector<float> leftChannelSignals; // vector to store a sample for all the audio sources to be resolved in the left channel
     std::vector<float> rightChannelSignals;// vector to store a sample for all the audio sources to be resolved in the right channel
 
-    
+    Envelope envelope;
     SineOsc carrier;
     SineOsc modulator;
     DelayLine delay;
@@ -75,6 +80,7 @@ private:
     
     float carrierCentralFrequency;
     float modulatorCentralFrequency;
+    float sr;
 
     juce::Random random;
     
