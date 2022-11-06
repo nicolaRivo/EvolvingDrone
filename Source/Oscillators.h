@@ -180,6 +180,7 @@ public:
     void setFrequency(float freq) override
     {
         assert((freq<20.0f)); // frequency i
+        Phasor::setFrequency(freq);
     }
     
     float output (float phase) override
