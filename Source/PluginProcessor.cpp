@@ -107,9 +107,12 @@ void EvolvingDroneAudioProcessor::prepareToPlay (double sampleRate, int samplesP
     
     //initialize an LFO that will modulate the modulator
     modulatorLfo.setSampleRate(sampleRate);
-    modulatorLfo.setFrequency(0.1f);
-    modulatorLfo.mapLFO(1.0f);
+    modulatorLfo.setFrequency(0.001f);
+    modulatorLfo.mapLFO(10.0f, -10.0f);
     
+    envelope.setSampleRate(sampleRate);
+    
+    sr = sampleRate;
     
 }
 
@@ -150,13 +153,13 @@ void EvolvingDroneAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer
     
     
     //activate debug flag
-    bool debug = 1;
+    bool debug = 0;
     
     int debugResolution = 200.0f;
     int debugResolutionCount = 1;
 
-
-    
+    bool production = 1; //activate production enviroment
+    bool testing = 0 ;   //activate testing enviroment
     
     juce::ScopedNoDenormals noDenormals;
     auto totalNumInputChannels  = getTotalNumInputChannels();
@@ -185,99 +188,120 @@ void EvolvingDroneAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer
     //DSP loop where numSamples corresponds to the buffer size
     for(int i = 0; i<numSamples; i++ )
     {
-        
         //debug handler
         bool displayDebug = 0;
         
         if (debugResolution % debugResolutionCount == 1)
             displayDebug = 1;
-
-        //initialize variables
-        float leftSample = 0.0f;
-        float rightSample = 0.0f;
-        float fmWave = 0.0f;
-        float carrierFrequency = 0.0f;
-        float modulationIntensity = 5.0f;
         
-        //set safety gain
-        float safetyGain = 0.4f;
-        
-        //shall the modulator wave frequency get modulated by the lfo?
-        bool modulateTheModulator = 1;
-        
-        //if modulateTheModulator, the modulatro wave frequency will get modulated as well
-        if (modulateTheModulator)
-        {
-            //process the LFO that moduates the frequency of the modulator and store it in processedModulatorLfo
-            float processedModulatorLfo = modulatorLfo.process();
+        if (testing){
+            float envelopeProcess = envelope.process();
             
-            //store the modulator frequency, modulated by adding the lfo value
-            float modulatorFrequency = modulatorCentralFrequency + processedModulatorLfo;
+            if (debug && displayDebug) std::cout << "envelope.getTimeFlow()-->" << envelope.getTimeFlow() << " || envelopeProcess-->" << envelopeProcess << " || envelope.getNodeName() -->"<< envelope.getNodeName() <<"\n\n";
             
-            //update the modulator frequency
-            modulator.setFrequency(modulatorFrequency);
-            if(debug && displayDebug) std::cout << "modulatorFrequency " << modulatorFrequency << "\n\n";
-            if(debug && displayDebug) std::cout << "LFO " << processedModulatorLfo << "\n\n";
-
-
-        }
-        
-
-        
-        //process the modulator and store it in processedModulator
-        float processedModulator = modulator.process();
-        float intensifiedModulator = processedModulator * modulationIntensity;
-        
-        //store the carrier modulated frequency
-        carrierFrequency = carrierCentralFrequency * intensifiedModulator;
-
-        //update the carrier frequency
-        carrier.setFrequency(carrierFrequency);
-        
-        if(debug && displayDebug) std::cout << "carrierFrequency " << carrierFrequency << "\n\n";
-        if(debug && displayDebug) std::cout << "modulatorOutput " << processedModulator << "\n\n";
-
-        
-        //process the carrier wave
-        fmWave = carrier.process();
-
-        leftChannelSignals.push_back(fmWave);
-        rightChannelSignals.push_back(fmWave);
-
-        
-
-        //sum each line of the leftChannelSignals vector together to obtain the unscaled leftSample
-        for(int j = 0; j < leftChannelSignals.size(); j++ )
-        {
-            leftSample += leftChannelSignals[j];
         }
 
-        //divide the leftSample value by the number of elements contained within the leftChannelSignals vector,
-        //to scale down the signal between -1 and 1
-        leftSample /= leftChannelSignals.size();
+        
+        if (production){
 
-        //apply safety gain
-        leftSample *= safetyGain;
 
-        //sum each line of the leftChannelSignals vector together
-        for(int j = 0; j < rightChannelSignals.size(); j++ )
-        {
-            rightSample += rightChannelSignals[j];
+            float envelopeProcess = envelope.process();
+            
+            //initialize variables
+            float leftSample = 0.0f;
+            float rightSample = 0.0f;
+            float fmWave = 0.0f;
+            float carrierFrequency = 0.0f;
+            float modulationIntensity = 5.0f;
+            
+            //set safety gain
+            float safetyGain = 0.4f;
+            
+            //shall the modulator wave frequency get modulated by the lfo?
+            bool modulateTheModulator = 1;
+            
+            //if modulateTheModulator, the modulatro wave frequency will get modulated as well
+            if (modulateTheModulator)
+            {
+                //process the LFO that moduates the frequency of the modulator and store it in processedModulatorLfo
+                float processedModulatorLfo = modulatorLfo.process();
+                
+                //store the modulator frequency, modulated by adding the lfo value
+                float modulatorFrequency = modulatorCentralFrequency + processedModulatorLfo;
+                
+                //update the modulator frequency
+                modulator.setFrequency(modulatorFrequency);
+                if(debug && displayDebug) std::cout << "modulatorFrequency " << modulatorFrequency << "\n\n";
+                if(debug && displayDebug) std::cout << "LFO freq" << modulatorLfo.getFrequency() << "\n\n";
+                if(debug && displayDebug) std::cout << "LFO " << processedModulatorLfo << "\n\n";
+
+
+            }
+            
+
+            
+            //process the modulator and store it in processedModulator
+            float processedModulator = modulator.process();
+            float intensifiedModulator = processedModulator * modulationIntensity;
+            
+            //store the carrier modulated frequency
+            carrierFrequency = carrierCentralFrequency * intensifiedModulator;
+
+            //update the carrier frequency
+            carrier.setFrequency(carrierFrequency);
+            
+            if(debug && displayDebug) std::cout << "carrierFrequency " << carrierFrequency << "\n\n";
+            if(debug && displayDebug) std::cout << "modulatorOutput " << processedModulator << "\n\n";
+
+            
+            //process the carrier wave
+            fmWave = carrier.process();
+
+            leftChannelSignals.push_back(fmWave);
+            rightChannelSignals.push_back(fmWave);
+
+            
+
+            //sum each line of the leftChannelSignals vector together to obtain the unscaled leftSample
+            for(int j = 0; j < leftChannelSignals.size(); j++ )
+            {
+                leftSample += leftChannelSignals[j];
+            }
+
+            //divide the leftSample value by the number of elements contained within the leftChannelSignals vector,
+            //to scale down the signal between -1 and 1
+            leftSample /= leftChannelSignals.size();
+
+            //randomly retrigger envelope
+            if (random.nextFloat() * 100.0f < 0.0001f)
+            {
+                envelope.trigger();
+            }
+            
+            
+            //apply safety gain
+            leftSample *= safetyGain;
+
+            //sum each line of the leftChannelSignals vector together
+            for(int j = 0; j < rightChannelSignals.size(); j++ )
+            {
+                rightSample += rightChannelSignals[j];
+            }
+            //divide the leftSample value by the number of elements contained within the leftChannelSignals vector,
+            //to scale down the signal between -1 and 1
+            rightSample /= rightChannelSignals.size();
+            //apply safety gain
+            rightSample *= safetyGain;
+
+            leftChannel[i] = leftSample * envelopeProcess;    //apply generated sample to left channel
+            rightChannel[i] = rightSample * envelopeProcess;  //apply generated sample to right channel
+            
+            //reset the channel vectors
+            rightChannelSignals.clear();
+            leftChannelSignals.clear();
+            
+            //incrementy debug resolution tool
         }
-        //divide the leftSample value by the number of elements contained within the leftChannelSignals vector,
-        //to scale down the signal between -1 and 1
-        rightSample /= rightChannelSignals.size();
-        //apply safety gain
-        rightSample *= safetyGain;
-
-        leftChannel[i] = leftSample;    //apply generated sample to left channel
-        rightChannel[i] = rightSample;  //apply generated sample to right channel
-        
-        //reset the channel vectors
-        rightChannelSignals.clear();
-        leftChannelSignals.clear();
-        
-        //incrementy debug resolution tool
         debugResolutionCount++;
     }
 }
