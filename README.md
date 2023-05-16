@@ -1,2 +1,2 @@
 # EvolvingDrone
-audio programming 2nd assignment November 2022
+Generative music composition, developed on JUCE framework, coded in C++
